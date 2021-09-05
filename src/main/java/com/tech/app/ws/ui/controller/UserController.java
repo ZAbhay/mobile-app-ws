@@ -49,6 +49,9 @@ public class UserController {
 //		returnValue.setLastName("Singh");
 //		returnValue.setUserId("1234");
 		
+		String firstName = null;
+		int firstNameLength = firstName.length();
+		
 		if(users.containsKey(userId))
 		{
 			return new ResponseEntity<UserRest>(users.get(userId), HttpStatus.OK) ;
