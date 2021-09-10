@@ -2,6 +2,13 @@ package com.tech.app.ws.ui.controller;
 
 
 
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,24 +19,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tech.app.ws.exceptions.UserServiceException;
 import com.tech.app.ws.ui.model.request.UpdateUserDetailsRequestModel;
 import com.tech.app.ws.ui.model.request.UserDetailsRequestModel;
 import com.tech.app.ws.ui.model.response.UserRest;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
+import com.tech.app.ws.ui.services.UserService;
 
 @RestController
 @RequestMapping("users")
 public class UserController {
 
 	Map<String, UserRest> users;
+	
+	@Autowired
+	UserService service;
 	
 	@GetMapping
 	public String getUser(@RequestParam(value="page", defaultValue="1") int page, @RequestParam(value="limit", defaultValue="50") int limit,
@@ -49,8 +52,12 @@ public class UserController {
 //		returnValue.setLastName("Singh");
 //		returnValue.setUserId("1234");
 		
-		String firstName = null;
-		int firstNameLength = firstName.length();
+		
+		/* Simulating NullPointerException */
+//		String firstName = null;
+//		int firstNameLength = firstName.length();
+		
+		if(true) throw new UserServiceException("A user service exception is thrown");
 		
 		if(users.containsKey(userId))
 		{
@@ -66,18 +73,7 @@ public class UserController {
 					MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<UserRest> createUser(@Validated @RequestBody UserDetailsRequestModel userDetails) {
         
-		UserRest returnValue = new UserRest();
-		
-		returnValue.setEmail(userDetails.getEmail());
-		returnValue.setFirstName(userDetails.getFirstName());
-		returnValue.setLastName(userDetails.getLastName());
-		
-		
-		String userId = UUID.randomUUID().toString();
-		returnValue.setUserId(userId);
-		
-		if(users==null) users = new HashMap<>();
-		users.put(userId, returnValue);
+		UserRest returnValue = service.createUser(userDetails);
 		
 		return new ResponseEntity<UserRest>(returnValue, HttpStatus.OK) ;
 	}
